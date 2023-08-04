@@ -22,5 +22,12 @@ app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
+// 4-3. 에러 핸들링
+app.use((err, req, res, next) => {
+    res.status(500).json({ message: err.message });
+})
+
 app.listen(PORT);
 console.log(`Running on port ${PORT}`);
+
+module.exports = app;   // 통합 테스트를 위해 exports
