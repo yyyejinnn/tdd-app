@@ -8,7 +8,9 @@ const allProducts = require('../data/all-products.json');
 // !! 참고: mock 데이터에 의존하는 부분은 무조건 성공이라고 가정하게 됨
 productModel.create = jest.fn();
 productModel.find = jest.fn();
+productModel.findById = jest.fn();
 
+const productId = '123456';
 let req, res, next;
 
 // 2-4-1. beforeEach 생성
@@ -31,8 +33,8 @@ describe('Product Controller Create', () => {
         expect(typeof productController.createProduct).toBe('function');     // 섹션 2-1-1. 해당 함수가 실제로 존재하는지 확인
     });
 
-    it('should call ProductModel.create', () => {
-        productController.createProduct(req, res, next);              // 2-2-1. createProduct() 함수 호출될 때
+    it('should call ProductModel.create', async () => {
+        await productController.createProduct(req, res, next);              // 2-2-1. createProduct() 함수 호출될 때
         expect(productModel.create).toBeCalledWith(newProduct);       // 2-2-2. 해당 model의 create 함수도 호출되는지 확인
     });
 
@@ -62,8 +64,8 @@ describe('Product Controller Get', () => {
         expect(typeof productController.getProduct).toBe('function');
     })
 
-    it('should call ProductModel.find({})', () => {
-        productController.getProduct(req, res, next);
+    it('should call ProductModel.find({})', async () => {
+        await productController.getProduct(req, res, next);
         expect(productModel.find).toHaveBeenCalledWith({});
     });
 
@@ -85,6 +87,42 @@ describe('Product Controller Get', () => {
         const rejectedPromise = Promise.reject(errorMessage);
         productModel.find.mockReturnValue(rejectedPromise);
         await productController.getProduct(req, res, next);
+        expect(next).toBeCalledWith(errorMessage);
+    });
+})
+
+
+describe('Product Controller GetById', () => {
+    it('should have a getProductById function', () => {
+        expect(typeof productController.getProductById).toBe('function');
+    })
+
+    it('should call ProductModel.findById()', async () => {
+        req.params.productId = productId;
+        await productController.getProductById(req, res, next);
+        expect(productModel.findById).toBeCalledWith(productId);
+    });
+
+    it('should return json body and 200 response code', async () => {
+        productModel.findById.mockReturnValue(newProduct);
+        await productController.getProductById(req, res, next);
+        expect(res.statusCode).toBe(200);
+        expect(res._getJSONData()).toStrictEqual(newProduct);
+        expect(res._isEndCalled()).toBeTruthy();
+    });
+
+    it('should return 404 when item doesnt exist', async () => {
+        productModel.findById.mockReturnValue(null);
+        await productController.getProductById(req, res, next);
+        expect(res.statusCode).toBe(404);
+        expect(res._isEndCalled()).toBeTruthy();
+    });
+
+    it("should handle errors", async () => {
+        const errorMessage = { message: "error finding product data by productId" };
+        const rejectedPromise = Promise.reject(errorMessage);
+        productModel.findById.mockReturnValue(rejectedPromise);
+        await productController.getProductById(req, res, next);
         expect(next).toBeCalledWith(errorMessage);
     });
 })

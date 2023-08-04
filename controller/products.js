@@ -18,6 +18,21 @@ exports.getProduct = async (req, res, next) => {
     }
 };
 
+exports.getProductById = async (req, res, next) => {
+    try {
+        const product = await productModel.findById(req.params.productId);
+
+        if (product == null) {
+            res.status(404).send();
+        }
+        else {
+            res.status(200).json(product);
+        }
+    } catch (error) {
+        next(error);
+    }
+}
+
 // exports.hello = (req, res)=> {
 //     res.send('안녕하세요');
 // };
