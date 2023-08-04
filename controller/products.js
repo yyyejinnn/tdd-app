@@ -9,6 +9,15 @@ exports.createProduct = async (req, res, next) => {     // async-await
     }
 };
 
+exports.getProduct = async (req, res, next) => {
+    try {
+        const allProducts = await productModel.find({});
+        res.status(200).json(allProducts);
+    } catch (error) {
+        next(error);
+    }
+};
+
 // exports.hello = (req, res)=> {
 //     res.send('안녕하세요');
 // };
