@@ -32,6 +32,9 @@ it('should return 500 on POST /api/products', async () => {
 })
 
 
+/**
+ * Get: 통합 테스트에서는 실제 DB에 존재하는 데이터들을 사용
+ */
 it('GET /api/products', async () => {
     const response = await request(app).get('/api/products');
 
@@ -39,4 +42,17 @@ it('GET /api/products', async () => {
     expect(Array.isArray(response.body)).toBeTruthy();
     expect(response.body[0].name).toBeDefined();            // 변수가 undefined인지 아닌지
     expect(response.body[0].description).toBeDefined();
+});
+
+it('GET /api/products/:productId', async () => {
+    const response = await request(app).get('/api/products/64c78306adda7d59eeec5bb8');  // 임시 productId
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.name).toBe('pen');
+    expect(response.body.description).toBe('good!');
+});
+
+it('should return 404 GET /api/products/:productId', async () => {
+    const response = await request(app).get('/api/products/64c78306adda7d59eeec5aaa');  // 임시 productId (존재하지 않는 id)
+    expect(response.statusCode).toBe(404);
 });
