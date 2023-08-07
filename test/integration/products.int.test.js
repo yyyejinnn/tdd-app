@@ -2,6 +2,10 @@ const request = require('supertest');
 const app = require('../../server');
 const newProduct = require('../data/new-product.json');
 
+/**
+ * 통합 테스트에서는 실제 DB에 존재하는 데이터들을 사용
+ */
+
 it('POST /api/products', async () => {
     const response = await request(app)
         .post('/api/products')
@@ -31,10 +35,6 @@ it('should return 500 on POST /api/products', async () => {
     })
 })
 
-
-/**
- * Get: 통합 테스트에서는 실제 DB에 존재하는 데이터들을 사용
- */
 it('GET /api/products', async () => {
     const response = await request(app).get('/api/products');
 
@@ -54,5 +54,27 @@ it('GET /api/products/:productId', async () => {
 
 it('should return 404 GET /api/products/:productId', async () => {
     const response = await request(app).get('/api/products/64c78306adda7d59eeec5aaa');  // 임시 productId (존재하지 않는 id)
+    expect(response.statusCode).toBe(404);
+});
+
+
+
+const updatedProduct = { name: "updated name", description: "updated description" };
+it('UPDATE /api/products/:productId', async () => {
+
+    const response = await request(app)
+        .patch('/api/products/64c78306adda7d59eeec5bb8')
+        .send(updatedProduct);
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.name).toBe(updatedProduct.name);
+    expect(response.body.description).toBe(updatedProduct.description);
+});
+
+it('should return 404 UPDATE /api/products/:productId', async () => {
+    const response = await request(app)
+        .patch('/api/products/64c78306adda7d59eeec5aaa')
+        .send(updatedProduct);
+
     expect(response.statusCode).toBe(404);
 });
