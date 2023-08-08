@@ -52,6 +52,22 @@ exports.updateProduct = async (req, res, next) => {
     }
 }
 
+exports.deleteProduct = async (req, res, next) => {
+    try {
+        const deleteProduct = await productModel.findByIdAndDelete(req.params.productId);
+
+        if (deleteProduct == null){
+            res.status(404).send();
+        }
+        else{
+            res.status(204).send();
+        }
+    } catch (error) {
+        next(error);
+    }
+
+}
+
 // exports.hello = (req, res)=> {
 //     res.send('안녕하세요');
 // };

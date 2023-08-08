@@ -78,3 +78,19 @@ it('should return 404 UPDATE /api/products/:productId', async () => {
 
     expect(response.statusCode).toBe(404);
 });
+
+it('DELETE /api/products/:productId', async () => {
+    const response = await request(app)
+    .delete('/api/products/64c78306adda7d59eeec5bb8')
+    .send();
+
+    expect(response.statusCode).toBe(204);
+});
+
+it('should return 404 DELETE /api/products/:productId', async () => {
+    const response = await request(app)
+    .delete('/api/products/64c78306adda7d59eeec5aaa')
+    .send();
+    
+    expect(response.statusCode).toBe(404);
+});
