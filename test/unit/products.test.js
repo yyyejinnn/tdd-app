@@ -14,6 +14,7 @@ productModel.findByIdAndDelete = jest.fn();
 
 const productId = '123456';
 const updatedProduct = { name: "updated name", description: "updated description" };
+const deletedProduct = { name: "deleted name", description: "it is deleted" };
 let req, res, next;
 
 // 2-4-1. beforeEach 생성
@@ -187,7 +188,7 @@ describe('Product Controller Delete', () => {
 
     it('should return 204 response code', async () => {
         req.params.productId = productId;
-        productModel.findByIdAndDelete.mockReturnValue(null);
+        productModel.findByIdAndDelete.mockReturnValue(deletedProduct);
         await productController.deleteProduct(req, res, next);
         expect(res.statusCode).toBe(204);
         expect(res._isEndCalled()).toBeTruthy();

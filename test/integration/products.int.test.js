@@ -2,6 +2,8 @@ const request = require('supertest');
 const app = require('../../server');
 const newProduct = require('../data/new-product.json');
 
+let createdProduct;
+
 /**
  * 통합 테스트에서는 실제 DB에 존재하는 데이터들을 사용
  */
@@ -14,6 +16,8 @@ it('POST /api/products', async () => {
     expect(response.statusCode).toBe(201);
     expect(response.body.name).toBe(newProduct.name);
     expect(response.body.description).toBe(newProduct.description);
+
+    createdProduct = response.body;
 });
 
 it('should return 500 on POST /api/products', async () => {
@@ -45,11 +49,11 @@ it('GET /api/products', async () => {
 });
 
 it('GET /api/products/:productId', async () => {
-    const response = await request(app).get('/api/products/64c78306adda7d59eeec5bb8');  // 임시 productId
+    const response = await request(app).get(`/api/products/${createdProduct._id}`);  // 임시 productId
 
     expect(response.statusCode).toBe(200);
-    expect(response.body.name).toBe('pen');
-    expect(response.body.description).toBe('good!');
+    expect(response.body.name).toBe(createdProduct.name);
+    expect(response.body.description).toBe(createdProduct.description);
 });
 
 it('should return 404 GET /api/products/:productId', async () => {
@@ -63,7 +67,7 @@ const updatedProduct = { name: "updated name", description: "updated description
 it('UPDATE /api/products/:productId', async () => {
 
     const response = await request(app)
-        .patch('/api/products/64c78306adda7d59eeec5bb8')
+        .patch(`/api/products/${createdProduct._id}`)
         .send(updatedProduct);
 
     expect(response.statusCode).toBe(200);
@@ -81,7 +85,7 @@ it('should return 404 UPDATE /api/products/:productId', async () => {
 
 it('DELETE /api/products/:productId', async () => {
     const response = await request(app)
-    .delete('/api/products/64c78306adda7d59eeec5bb8')
+    .delete(`/api/products/${createdProduct._id}`)
     .send();
 
     expect(response.statusCode).toBe(204);
@@ -89,8 +93,8 @@ it('DELETE /api/products/:productId', async () => {
 
 it('should return 404 DELETE /api/products/:productId', async () => {
     const response = await request(app)
-    .delete('/api/products/64c78306adda7d59eeec5aaa')
+    .delete(`/api/products/${createdProduct._id}`)
     .send();
-    
+
     expect(response.statusCode).toBe(404);
 });
